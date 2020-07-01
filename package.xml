@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package>
+  <name>fabrik_ros</name>
+  <version>0.1.0</version>
+  <description>A ros package to use fabrik</description>
+  <license>BSD</license>
+
+  <author email="homidari@gmail.com">Omid Heidari</author>
+
+  <maintainer email="homidari@gmail.com">Omid Heidari</maintainer>
+
+  <!-- <url type="website">https://ros-planning.github.io/moveit_tutorials</url>
+  <url type="repository">https://github.com/ros-planning/moveit_tutorials</url>
+  <url type="bugtracker">https://github.com/ros-planning/moveit_tutorials/issues</url> -->
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>pluginlib</build_depend>
+  <build_depend>eigen</build_depend>
+  <build_depend>roscpp</build_depend>
+  <!-- <build_depend>fabrik</build_depend> -->
+  
+  <run_depend>pluginlib</run_depend>
+  <run_depend>fabrik</run_depend>
+  <run_depend>roscpp</run_depend>
+
+  
+  <!-- <test_depend>moveit_resources</test_depend>
+  <test_depend>rosunit</test_depend> -->
+
+</package>
