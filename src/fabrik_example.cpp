@@ -6,6 +6,9 @@
 
 #include <fabrik/base/fabrik.h>
 
+
+//  ?????????? use rviz visual tools? or straight rviz iteslef???
+
 class MakerPlanar
 {
 public:
@@ -22,19 +25,19 @@ public:
         vec1.normalize();
         Eigen::Affine3d link1_frame(Eigen::AngleAxisd(0, vec1));
         link1_frame.translation() = Eigen::Vector3d(1, 0, 0);
-        robot_model::Link link1("link1",  link1_frame);
+        fabrik::Link link1("link1",  link1_frame);
 
         Eigen::Vector3d vec2(0,0,1);
         vec2.normalize();
         Eigen::Affine3d link2_frame(Eigen::AngleAxisd(0, vec2));
         link2_frame.translation() = Eigen::Vector3d(1, 0, 0);
-        robot_model::Link link2("link2",  link2_frame);
+        fabrik::Link link2("link2",  link2_frame);
 
         Eigen::Vector3d vec3(0,0,1);
         vec3.normalize();
         Eigen::Affine3d link3_frame(Eigen::AngleAxisd(0, vec3));
         link3_frame.translation() = Eigen::Vector3d(1, 0, 0);
-        robot_model::Link link3("link3",  link3_frame);
+        fabrik::Link link3("link3",  link3_frame);
 
         chain.push_back(link1);
         chain.push_back(link2);
@@ -50,7 +53,7 @@ public:
         base = base_transformation;
     }
 
-    std::vector<robot_model::Link> chain;
+    std::vector<fabrik::Link> chain;
     Eigen::Affine3d base;
 };
 
@@ -72,10 +75,10 @@ int main(int argc, char** argv)
   std::vector<double> fk_joints_values_1 = {M_PI_4, 0, 0};
 
   // ---------------------- Solve another forward kinematics close to the first one:
-    robot_state::RobotStatePtr robot_state_2 = 
-        std::make_shared<robot_state::RobotState>(maker.chain, maker.base);
+    fabrik::RobotStatePtr robot_state_2 = 
+        std::make_shared<fabrik::RobotState>(maker.chain, maker.base);
     
-    robot_state_2->setReachingDirection(robot_state::ReachingDirection::FORWARD);
+    robot_state_2->setReachingDirection(fabrik::ReachingDirection::FORWARD);
     double theta_1 = M_PI_4 + 0.1;
     double theta_2 = 0.1;
     double theta_3 = 0.1;
@@ -110,4 +113,10 @@ int main(int argc, char** argv)
         for (int k = 0; k < 3; ++k)
             std::cout << "joint value_" << k << ":" << output.solution_joints_values[k] << std::endl;
     }
+
+
+  // Visualization
+  // ========================================================================================
+  
+
 }

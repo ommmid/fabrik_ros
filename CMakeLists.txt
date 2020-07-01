@@ -6,7 +6,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(catkin REQUIRED
   COMPONENTS
-  roscpp
+  interactive_markers
+   roscpp
 )
 
 find_package(Eigen3 REQUIRED)

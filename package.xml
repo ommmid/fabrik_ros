@@ -20,6 +20,13 @@
   <build_depend>roscpp</build_depend>
   <!-- <build_depend>fabrik</build_depend> -->
   
+  <build_depend>interactive_markers</build_depend>
+  <build_depend>rviz_visual_tools</build_depend>
+
+  <run_depend>interactive_markers</run_depend>
+  <run_depend>rviz_visual_tools</run_depend>
+  
+
   <run_depend>pluginlib</run_depend>
   <run_depend>fabrik</run_depend>
   <run_depend>roscpp</run_depend>
