@@ -37,9 +37,9 @@ int main(int argc, char** argv)
 
   fabrik::RobotStatePtr robot_state_1 = std::make_shared<fabrik::RobotState>(robot_model);
   robot_state_1->setReachingDirection(fabrik::ReachingDirection::FORWARD);
-  double theta_1 = M_PI_4;
-  double theta_2 = 0.1;
-  double theta_3 = 0.1;
+  double theta_1 = M_PI_4 / 5;
+  double theta_2 = 0.2;
+  double theta_3 = 0.41;
   std::vector<double> fk_joints_values_1 = {theta_1, theta_2, theta_3};
   for (int k = 0; k < 3; ++k)
       robot_state_1->updateState(fk_joints_values_1[k], k);
@@ -50,9 +50,9 @@ int main(int argc, char** argv)
 
   fabrik::RobotStatePtr robot_state_2 = std::make_shared<fabrik::RobotState>(robot_model);   
   robot_state_2->setReachingDirection(fabrik::ReachingDirection::FORWARD);
-  theta_1 = M_PI_4 + 0.1;
-  theta_2 = 0.1;
-  theta_3 = 0.1;
+  theta_1 = theta_1 + 0.2;
+  theta_2 = theta_2 + 0.2;
+  theta_3 = theta_3 + 0.1;
   std::vector<double> fk_joints_values_2 = {theta_1, theta_2, theta_3};
   for (int k = 0; k < 3; ++k)
       robot_state_2->updateState(fk_joints_values_2[k], k);
@@ -62,8 +62,8 @@ int main(int argc, char** argv)
   Eigen::Affine3d end_effector_2 = robot_state_2->getFrames(2).second;
 
   Eigen::Affine3d target = end_effector_2;
-  double threshold = 0.001;
-  double requested_iteration_num = 3;
+  double threshold = 0.01;
+  double requested_iteration_num = 10;
 
   fabrik::FABRIKPtr fabrik(new fabrik::FABRIK(robot_model,
                                               fk_joints_values_1,
