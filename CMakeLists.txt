@@ -7,6 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(catkin REQUIRED
   COMPONENTS
   interactive_markers
+  rviz_visual_tools
    roscpp
 )
 
@@ -42,13 +43,17 @@ endif()
 message([WARNING] " $fabrik_INCLUDE_DIR: ${FABRIK_INCLUDE_DIR}")
 message([WARNING] " $fabrik_INCLUDE_DIRS: ${FABRIK_INCLUDE_DIRs}")
 
-
 include_directories(${THIS_PACKAGE_INCLUDE_DIRS}
                     ${catkin_INCLUDE_DIRS}
                     ${Boost_INCLUDE_DIR}
                     ${EIGEN3_INCLUDE_DIRS}
                     ${FABRIK_INCLUDE_DIR})
 
-add_executable(example src/fabrik_example.cpp)
-target_link_libraries(example fabrik ${catkin_LIBRARIES} )
+add_executable(test_node src/test_node.cpp)
+target_link_libraries(test_node fabrik ${catkin_LIBRARIES} )
 
+add_executable(rviz_visual_tools_demo src/rviz_visual_tools_demo.cpp)
+target_link_libraries(rviz_visual_tools_demo ${catkin_LIBRARIES} )
+
+add_executable(visualize_fabrik_solution src/visualize_fabrik_solution.cpp)
+target_link_libraries(visualize_fabrik_solution fabrik ${catkin_LIBRARIES} )
