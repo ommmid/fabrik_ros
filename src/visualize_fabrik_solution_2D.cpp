@@ -88,6 +88,15 @@ int main(int argc, char** argv)
   fabrik::FabrikOutput output;
   bool solved = fabrik->solve(output);
 
+  if(solved)
+  {
+    std::cout << "---------- error track ----------" << std::endl;
+    for(int i = 0; i < output.target_ee_error_track.size(); ++i)
+    {
+      std::cout << output.target_ee_error_track[i] << std::endl;
+    }
+  }
+
   // std::cout << "solved? " << solved << std::endl;
   // if(solved)
   // {
@@ -130,7 +139,8 @@ int main(int argc, char** argv)
     }
 
   visual_tools_->prompt("press next to delete the first marker");
-  removeMarker(node_handle, 1);
+  // removeMarker(node_handle, 1);
+  // visual_tools_->removeMarkerWithID(1);
  
   // --------------------------------------------------
     visual_tools_->prompt("press next to see the Taregt for Inverse Kinematics");
@@ -199,9 +209,7 @@ int main(int argc, char** argv)
 
         ros::Duration(1.0).sleep();
       } 
-    }
-    
-
+    }  
     
   }
 

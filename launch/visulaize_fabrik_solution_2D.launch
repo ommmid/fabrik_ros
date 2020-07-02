@@ -13,8 +13,8 @@
   <arg     if="$(arg debug)" name="launch_prefix" value="gdb --ex run --args" />
 
   <!-- Start demo -->
-  <node name="visualize_fabrik_solution" launch-prefix="$(arg launch_prefix)" pkg="fabrik_ros"
-	type="visualize_fabrik_solution" output="screen">
+  <node name="visualize_fabrik_solution_2D" launch-prefix="$(arg launch_prefix)" pkg="fabrik_ros"
+	type="visualize_fabrik_solution_2D" output="screen">
   </node>
 
 </launch>

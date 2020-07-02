@@ -55,5 +55,8 @@ target_link_libraries(test_node fabrik ${catkin_LIBRARIES} )
 add_executable(rviz_visual_tools_demo src/rviz_visual_tools_demo.cpp)
 target_link_libraries(rviz_visual_tools_demo ${catkin_LIBRARIES} )
 
-add_executable(visualize_fabrik_solution src/visualize_fabrik_solution.cpp)
-target_link_libraries(visualize_fabrik_solution fabrik ${catkin_LIBRARIES} )
+add_executable(visualize_fabrik_solution_2D src/visualize_fabrik_solution_2D.cpp)
+target_link_libraries(visualize_fabrik_solution_2D fabrik ${catkin_LIBRARIES} )
+
+add_executable(visualize_fabrik_solution_3D src/visualize_fabrik_solution_3D.cpp)
+target_link_libraries(visualize_fabrik_solution_3D fabrik ${catkin_LIBRARIES} )
