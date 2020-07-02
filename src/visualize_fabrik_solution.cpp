@@ -19,18 +19,31 @@ void publishLabelHelper(rvt::RvizVisualToolsPtr& visual_tools_, const Eigen::Iso
     visual_tools_->publishText(pose_copy, label, rvt::WHITE, rvt::XXLARGE, false);
 }
 
+void removeMarker(ros::NodeHandle& node_handle, int id_to_remove)
+{
+  // to delete markers, publish to the /rviz_visual_tools topic. I should remember the id and set the action to 3 I guess
+  ros::Publisher pub_marker = node_handle.advertise<visualization_msgs::MarkerArray>("/rviz_visual_tools", 10);
+  visualization_msgs::Marker empty_marker;
+  empty_marker.header.frame_id = "world";
+  empty_marker.id = id_to_remove;
+  empty_marker.header.stamp = ros::Time();
+  empty_marker.ns = "deleteAllMarkers";  
+  empty_marker.action = 3; // action 3 means delete
+  empty_marker.pose.orientation.w = 1;
+
+  visualization_msgs::MarkerArray empty_marker_array;
+  empty_marker_array.markers.push_back(empty_marker);
+  pub_marker.publish(empty_marker_array);
+}
+  
+
 int main(int argc, char** argv)
 {
   const std::string NODE_NAME = "visualize_fabrik_solution";
   ros::init(argc, argv, NODE_NAME);
   ros::AsyncSpinner spinner(1);
   spinner.start();
-  // ros::NodeHandle node_handle("~");
-
-  std::cout << "--------- test " << std::endl;
-
-  double randm_num = fabrik::randomDouble(0, 1);
-  std::cout << "random num from fabrik: " << randm_num << std::endl;
+  ros::NodeHandle node_handle("~");
 
   // ---------------------- Solve another forward kinematics close to the first one:
   fabrik::RobotModelPtr robot_model = fabrik::makeSimpleRobot2D();
@@ -75,24 +88,14 @@ int main(int argc, char** argv)
   fabrik::FabrikOutput output;
   bool solved = fabrik->solve(output);
 
-  std::cout << "solved? " << solved << std::endl;
-  if(solved)
-  {
-      std::cout << "total iteration: " << output.final_iteration_num << std::endl;
-      std::cout << "error: " << output.target_ee_error << std::endl;
-      for (int k = 0; k < 3; ++k)
-          std::cout << "joint value_" << k << ":" << output.solution_joints_values[k] << std::endl;
-  }
-
-  // std::vector<std::vector<std::pair<Eigen::Affine3d, Eigen::Affine3d>>> frames_matrix;
-  // output.frames_matrix
-
-
-  // convert affine and isometry
-  // Eigen::AffineCompact3f a;
-  // Eigen::Isometry3f b;
-  // b.translation() = a.translation();
-  // b.linear() = a.rotation();
+  // std::cout << "solved? " << solved << std::endl;
+  // if(solved)
+  // {
+  //     std::cout << "total iteration: " << output.final_iteration_num << std::endl;
+  //     std::cout << "error: " << output.target_ee_error << std::endl;
+  //     for (int k = 0; k < 3; ++k)
+  //         std::cout << "joint value_" << k << ":" << output.solution_joints_values[k] << std::endl;
+  // }
 
   // Visualization
   // ========================================================================================
@@ -108,24 +111,27 @@ int main(int argc, char** argv)
     visual_tools_->deleteAllMarkers();
     visual_tools_->enableBatchPublishing();
 
- // --------------------------------------------------
-    visual_tools_->prompt("press next to see the Initial pose of the End_Effector");
-    
-    Eigen::Isometry3d coordinate_isometry;
-    coordinate_isometry.translation() = end_effector_1.translation();
-    coordinate_isometry.linear() = end_effector_1.rotation();
-    visual_tools_->publishAxis(coordinate_isometry);
-    publishLabelHelper(visual_tools_, coordinate_isometry, "Initial Pose");
-    visual_tools_->trigger();
+  // --------------------------------------------------
+  visual_tools_->prompt("press next to see the Initial pose of the End_Effector");
+  
+  Eigen::Isometry3d coordinate_isometry;
+  coordinate_isometry.translation() = end_effector_1.translation();
+  coordinate_isometry.linear() = end_effector_1.rotation();
+  visual_tools_->publishAxis(coordinate_isometry);
+  publishLabelHelper(visual_tools_, coordinate_isometry, "Initial Pose");
+  visual_tools_->trigger();
 
+  for (int k = 0; k < 3; ++k)
+    {   
+      // link
+      Eigen::Vector3d point1 = robot_state_1->getFrames(k).first.translation();
+      Eigen::Vector3d point2 = robot_state_1->getFrames(k).second.translation();
+      visual_tools_->publishCylinder(point1, point2);   
+    }
 
-    for (int k = 0; k < 3; ++k)
-      {   
-        // link
-        Eigen::Vector3d point1 = robot_state_1->getFrames(k).first.translation();
-        Eigen::Vector3d point2 = robot_state_1->getFrames(k).second.translation();
-        visual_tools_->publishCylinder(point1, point2);   
-      }
+  visual_tools_->prompt("press next to delete the first marker");
+  removeMarker(node_handle, 1);
+ 
   // --------------------------------------------------
     visual_tools_->prompt("press next to see the Taregt for Inverse Kinematics");
     
@@ -140,6 +146,9 @@ int main(int argc, char** argv)
   int bfr = output.frames_matrix.size();
   for (int t = 0; t < bfr; ++t)
   {
+    // marker.action = visualization_msgs::Marker::ADD;
+    
+
     if( std::remainder(t, 2) == 0 )
     {
       for (int k = 2; k > -1; --k)
@@ -154,13 +163,13 @@ int main(int argc, char** argv)
         coordinate_isometry.translation() = output.frames_matrix[t][k].first.translation();
         coordinate_isometry.linear() = output.frames_matrix[t][k].first.rotation();
         visual_tools_->publishAxis(coordinate_isometry);
-        publishLabelHelper(visual_tools_, coordinate_isometry, "start" + std::to_string(k));
+        // publishLabelHelper(visual_tools_, coordinate_isometry, "start" + std::to_string(k));
         visual_tools_->trigger();
 
         coordinate_isometry.translation() = output.frames_matrix[t][k].second.translation();
         coordinate_isometry.linear() = output.frames_matrix[t][k].second.rotation();
         visual_tools_->publishAxis(coordinate_isometry);
-        publishLabelHelper(visual_tools_, coordinate_isometry, "end" + std::to_string(k));
+        // publishLabelHelper(visual_tools_, coordinate_isometry, "end" + std::to_string(k));
         visual_tools_->trigger();
 
         ros::Duration(1.0).sleep();
@@ -179,13 +188,13 @@ int main(int argc, char** argv)
         coordinate_isometry.translation() = output.frames_matrix[t][k].first.translation();
         coordinate_isometry.linear() = output.frames_matrix[t][k].first.rotation();
         visual_tools_->publishAxis(coordinate_isometry);
-        publishLabelHelper(visual_tools_, coordinate_isometry, "start" + std::to_string(k));
+        // publishLabelHelper(visual_tools_, coordinate_isometry, "start" + std::to_string(k));
         visual_tools_->trigger();
 
         coordinate_isometry.translation() = output.frames_matrix[t][k].second.translation();
         coordinate_isometry.linear() = output.frames_matrix[t][k].second.rotation();
         visual_tools_->publishAxis(coordinate_isometry);
-        publishLabelHelper(visual_tools_, coordinate_isometry, "end" + std::to_string(k));
+        // publishLabelHelper(visual_tools_, coordinate_isometry, "end" + std::to_string(k));
         visual_tools_->trigger();
 
         ros::Duration(1.0).sleep();
@@ -195,6 +204,8 @@ int main(int argc, char** argv)
 
     
   }
+
+    
 
   visual_tools_->prompt("done");
 
