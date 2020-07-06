@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+
+<launch>
+    
+  <arg name="load_gripper" default="true" />
+  <param unless="$(arg load_gripper)" name="robot_description" command="$(find xacro)/xacro $(find franka_description)/robots/panda_arm.urdf.xacro" />
+  <param if="$(arg load_gripper)" name="robot_description" command="$(find xacro)/xacro     $(find franka_description)/robots/panda_arm_hand.urdf.xacro" />
+
+
+  <!-- Fake transform from world origin to robot origin (base) -->
+  <node pkg="tf" type="static_transform_publisher" name="base_to_world" 
+    args="0 0 0 0 0 0 /world /panda_link0 30" output="screen"/>
+
+
+    <!--param name="robot_description" textfile="???/urdf/myrobot.urdf" /-->
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+<!-- Load Rviz -->
+  <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false"
+	args="-d $(find fabrik_ros)/launch/urdf2fabrik.rviz" output="screen"  required="true"  >
+  </node>
+
+
+  <node name="urdf2fabrik"  pkg="fabrik_ros" type="urdf2fabrik" output="screen">
+  </node>
+
+</launch>

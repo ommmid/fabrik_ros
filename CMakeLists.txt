@@ -9,6 +9,7 @@ find_package(catkin REQUIRED
   interactive_markers
   rviz_visual_tools
    roscpp
+   urdf
 )
 
 find_package(Eigen3 REQUIRED)
@@ -20,6 +21,7 @@ catkin_package(
 #   CATKIN_DEPENDS
   DEPENDS
     EIGEN3
+
 )
 
 message([WARNING] "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
@@ -63,3 +65,14 @@ target_link_libraries(visualize_fabrik_solution_3D fabrik ${catkin_LIBRARIES} )
 
 add_executable(test_calculateReach src/test_calculateReach.cpp)
 target_link_libraries(test_calculateReach fabrik ${catkin_LIBRARIES} )
+
+
+include_directories(include)
+add_library(FabrikModel src/fabrik_model/fabrik_model.cpp)
+target_link_libraries(FabrikModel fabrik)
+
+add_executable(urdf2fabrik src/convert_urdf_to_fabrik_model.cpp)
+target_link_libraries(urdf2fabrik fabrik FabrikModel  ${catkin_LIBRARIES} )
+
+
+
