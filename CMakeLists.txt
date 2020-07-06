@@ -60,3 +60,6 @@ target_link_libraries(visualize_fabrik_solution_2D fabrik ${catkin_LIBRARIES} )
 
 add_executable(visualize_fabrik_solution_3D src/visualize_fabrik_solution_3D.cpp)
 target_link_libraries(visualize_fabrik_solution_3D fabrik ${catkin_LIBRARIES} )
+
+add_executable(test_calculateReach src/test_calculateReach.cpp)
+target_link_libraries(test_calculateReach fabrik ${catkin_LIBRARIES} )

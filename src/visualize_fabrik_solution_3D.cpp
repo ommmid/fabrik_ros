@@ -13,9 +13,11 @@ namespace rvt = rviz_visual_tools;
 
 void publishLabelHelper(rvt::RvizVisualToolsPtr& visual_tools_, const Eigen::Isometry3d& pose, const std::string& label)
 {
-    Eigen::Isometry3d pose_copy = pose;
-    pose_copy.translation().x() -= 0.2;
-    visual_tools_->publishText(pose_copy, label, rvt::WHITE, rvt::XXLARGE, false);
+  Eigen::Vector3d location = pose.translation();
+  std::string str = label + ":\n" + std::to_string(location(0)) + "\n" + std::to_string(location(1)) + "\n" + std::to_string(location(2));
+  Eigen::Isometry3d pose_copy = pose;
+  pose_copy.translation().x() -= 0.2;
+  visual_tools_->publishText(pose_copy, str, rvt::WHITE, rvt::scales::LARGE, false);
 }
 
 void removeMarker(ros::NodeHandle& node_handle, int id_to_remove)
@@ -43,44 +45,42 @@ int main(int argc, char** argv)
   spinner.start();
   ros::NodeHandle node_handle("~");
 
-  // make a 3d robot:
+  //------------------------ make a 3d robot:
   std::string robot_name = "simple 3D robot";
 
-    Eigen::Vector3d vec0(0,0,1);;
-    vec0.normalize();
-    Eigen::Affine3d base(Eigen::AngleAxisd(0, vec0));
-    base.translation() = Eigen::Vector3d(0, 0, 0);
-    std::cout << "base_frame:\n" << base.matrix() << std::endl;
+  Eigen::Vector3d vec0(0,0,1);;
+  vec0.normalize();
+  Eigen::Affine3d base(Eigen::AngleAxisd(0, vec0));
+  base.translation() = Eigen::Vector3d(0, 0, 0);
+  std::cout << "base_frame:\n" << base.matrix() << std::endl;
 
-    Eigen::Vector3d vec1 = Eigen::MatrixXd::Random(3,1); vec1.normalize();
-    Eigen::Affine3d link1_frame(Eigen::AngleAxisd(0.2, vec1));
-    Eigen::Vector3d trans1 =  Eigen::MatrixXd::Random(3,1); trans1.normalize(); // Eigen::Vector3d(1, 0, 0);//
-    link1_frame.translation() = trans1;
-    fabrik::Link link1("link1",  link1_frame);
-    std::cout << "link1_frame:\n" << link1_frame.matrix() << std::endl;
+  Eigen::Vector3d vec1 = Eigen::Vector3d(1,2,3); vec1.normalize();
+  Eigen::Affine3d link1_frame(Eigen::AngleAxisd(0.2, vec1));
+  Eigen::Vector3d trans1 =  Eigen::Vector3d(1,1,0.3); trans1.normalize(); 
+  link1_frame.translation() = trans1;
+  fabrik::Link link1("link1",  link1_frame);
+  std::cout << "link1_frame:\n" << link1_frame.matrix() << std::endl;
 
-    Eigen::Vector3d vec2 = Eigen::MatrixXd::Random(3,1);
-    vec2.normalize();
-    Eigen::Affine3d link2_frame(Eigen::AngleAxisd(0.6, vec2));
-    Eigen::Vector3d trans2 = Eigen::MatrixXd::Random(3,1); trans2.normalize();
-    link2_frame.translation() = trans2;
-    fabrik::Link link2("link2",  link2_frame);
-    std::cout << "link2_frame:\n" << link2_frame.matrix() << std::endl;
+  Eigen::Vector3d vec2 = Eigen::Vector3d(1,1,3); vec2.normalize();
+  Eigen::Affine3d link2_frame(Eigen::AngleAxisd(0.6, vec2));
+  Eigen::Vector3d trans2 = Eigen::Vector3d(2,1,0.5); trans2.normalize();
+  link2_frame.translation() = trans2;
+  fabrik::Link link2("link2",  link2_frame);
+  std::cout << "link2_frame:\n" << link2_frame.matrix() << std::endl;
 
-    Eigen::Vector3d vec3 = Eigen::MatrixXd::Random(3,1);
-    vec3.normalize();
-    Eigen::Affine3d link3_frame(Eigen::AngleAxisd(0.7, vec3));
-    Eigen::Vector3d trans3 = Eigen::MatrixXd::Random(3,1); trans3.normalize();
-    link3_frame.translation() = trans3;
-    fabrik::Link link3("link3",  link3_frame);
-    std::cout << "link3_frame:\n" << link3_frame.matrix() << std::endl;
+  Eigen::Vector3d vec3 = Eigen::Vector3d(2,1,4); vec3.normalize();
+  Eigen::Affine3d link3_frame(Eigen::AngleAxisd(0.7, vec3));
+  Eigen::Vector3d trans3 = Eigen::Vector3d(3,1,0.7); trans3.normalize();
+  link3_frame.translation() = trans3;
+  fabrik::Link link3("link3",  link3_frame);
+  std::cout << "link3_frame:\n" << link3_frame.matrix() << std::endl;
 
-    std::vector<fabrik::Link> chain;
-    chain.push_back(link1);
-    chain.push_back(link2);
-    chain.push_back(link3);
-    
-    fabrik::RobotModelPtr robot_model = std::make_shared<fabrik::RobotModel>(robot_name, base, chain);
+  std::vector<fabrik::Link> chain;
+  chain.push_back(link1);
+  chain.push_back(link2);
+  chain.push_back(link3);
+  
+  fabrik::RobotModelPtr robot_model = std::make_shared<fabrik::RobotModel>(robot_name, base, chain);
 
   // ---------------------- Solve another forward kinematics close to the first one:
   // fabrik::RobotModelPtr robot_model = fabrik::makeSimpleRobot3D();
@@ -100,9 +100,9 @@ int main(int argc, char** argv)
 
   fabrik::RobotStatePtr robot_state_2 = std::make_shared<fabrik::RobotState>(robot_model);   
   robot_state_2->setReachingDirection(fabrik::ReachingDirection::FORWARD);
-  theta_1 = theta_1 + 0.2;
-  theta_2 = theta_2 + 0.2;
-  theta_3 = theta_3 + 0.1;
+  theta_1 = theta_1 + 0.4; // 0.2;
+  theta_2 = theta_2 + 0.3; // 0.2;
+  theta_3 = theta_3 + 0.2; // 0.1;
   std::vector<double> fk_joints_values_2 = {theta_1, theta_2, theta_3};
   for (int k = 0; k < 3; ++k)
       robot_state_2->updateState(fk_joints_values_2[k], k);
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
 
   Eigen::Affine3d target = end_effector_2;
   double threshold = 0.01;
-  double requested_iteration_num = 3;
+  double requested_iteration_num = 10;
 
   fabrik::FABRIKPtr fabrik(new fabrik::FABRIK(robot_model,
                                               fk_joints_values_1,
@@ -133,6 +133,9 @@ int main(int argc, char** argv)
       std::cout << output.target_ee_error_track[i] << std::endl;
     }
   }
+
+  std::cout << "output.start_to_aim.size() ================= " << output.start_to_aim_track.size() << std::endl;
+
 
   // Visualization
   // ========================================================================================
@@ -177,7 +180,7 @@ int main(int argc, char** argv)
       visual_tools_->trigger();
     }
 
-  visual_tools_->prompt("press next to delete the first marker");
+  // visual_tools_->prompt("press next to delete the first marker");
   // removeMarker(node_handle, 1);
   // visual_tools_->removeMarkerWithID(1);
  
@@ -192,6 +195,9 @@ int main(int argc, char** argv)
 
   // --------------------------------------------------
   visual_tools_->prompt("press next to see the procedure");
+  
+  // *** start_to_aim(green) and start_to_aim_project(brown) must be on the same plane that the link(blue) lies on ***
+
   int bfr = output.frames_matrix.size();
   for (int t = 0; t < bfr; ++t)
   {
@@ -204,31 +210,76 @@ int main(int argc, char** argv)
         Eigen::Vector3d point2 = output.frames_matrix[t][k].second.translation();
         visual_tools_->publishCylinder(point1, point2);   
 
+        // in backward reaching there is no calculate and projection for J_0
+        // if ( k != 0)
+        // {
+        //   Eigen::Vector3d point1 = output.frames_matrix[t][k].first.translation();
+        //   Eigen::Vector3d point2 = point1 + output.start_to_aim_track[t][k];
+        //   visual_tools_->publishCylinder(point1, point2, rvt::colors::GREEN, rvt::scales::SMALL, "start_to_aim");
+        //   Eigen::Isometry3d text_pose; 
+        //   text_pose.translation() = point1;
+        //   text_pose.linear() = target.rotation();
+        //   publishLabelHelper(visual_tools_, text_pose, "s2" );
+        //   text_pose.translation() = point2;
+        //   publishLabelHelper(visual_tools_, text_pose, "e0" );
+          
+        //   point2 = point1 + output.start_to_aim_projected_track[t][k];
+        //   visual_tools_->publishCylinder(point1, point2, rvt::colors::BROWN, rvt::scales::SMALL, "start_to_aim_projected"); 
+        //   text_pose.translation() = point2;
+        //   publishLabelHelper(visual_tools_, text_pose, "e0_projected" );
+
+        //   point2 = point1 + output.start_to_end_track[t][k];
+        //   visual_tools_->publishCylinder(point1, point2, rvt::colors::WHITE, rvt::scales::SMALL, "start_to_end");
+        //   text_pose.translation() = point2;
+        //   publishLabelHelper(visual_tools_, text_pose, "s1" );
+
+        //   point2 = point1 + output.start_to_end_projected_track[t][k];
+        //   visual_tools_->publishCylinder(point1, point2, rvt::colors::CYAN, rvt::scales::SMALL, "start_to_end_projected");
+        //   text_pose.translation() = point2;
+        //   publishLabelHelper(visual_tools_, text_pose, "s1_projected" );
+        // }
+        
         // first
-        Eigen::Isometry3d coordinate_isometry;
-        coordinate_isometry.translation() = output.frames_matrix[t][k].first.translation();
-        coordinate_isometry.linear() = output.frames_matrix[t][k].first.rotation();
-        visual_tools_->publishAxis(coordinate_isometry);
+        Eigen::Isometry3d c_isometry;
+        c_isometry.translation() = output.frames_matrix[t][k].first.translation();
+        c_isometry.linear() = output.frames_matrix[t][k].first.rotation();
+        visual_tools_->publishAxis(c_isometry);
         // publishLabelHelper(visual_tools_, coordinate_isometry, "start" + std::to_string(k));
         visual_tools_->trigger();
 
-        coordinate_isometry.translation() = output.frames_matrix[t][k].second.translation();
-        coordinate_isometry.linear() = output.frames_matrix[t][k].second.rotation();
-        visual_tools_->publishAxis(coordinate_isometry);
-       publishLabelHelper(visual_tools_, coordinate_isometry, "end" + std::to_string(k));
+        c_isometry.translation() = output.frames_matrix[t][k].second.translation();
+        c_isometry.linear() = output.frames_matrix[t][k].second.rotation();
+        visual_tools_->publishAxis(c_isometry);
+        publishLabelHelper(visual_tools_, c_isometry, "end" + std::to_string(k));
         visual_tools_->trigger();
 
-        // ros::Duration(1.0).sleep();
-        visual_tools_->prompt("next");
+        ros::Duration(1.0).sleep();
+        // visual_tools_->prompt("next");
       }
     }else
     {
       for (int k = 0; k < 3; ++k)
       {   
         // link
-        Eigen::Vector3d point1 = output.frames_matrix[t][k].first.translation();
-        Eigen::Vector3d point2 = output.frames_matrix[t][k].second.translation();
-        visual_tools_->publishCylinder(point1, point2);   
+      Eigen::Vector3d point1 = output.frames_matrix[t][k].first.translation();
+      Eigen::Vector3d point2 = output.frames_matrix[t][k].second.translation();
+      visual_tools_->publishCylinder(point1, point2);   
+
+      // visual_tools_->publishCylinder(output.frames_matrix[t][k].first.translation(),
+      //                                 output.frames_matrix[t][k].first.translation() + output.start_to_aim_track[t][k],
+      //                                 rvt::colors::GREEN, rvt::scales::SMALL, "start_to_aim");
+      
+      // visual_tools_->publishCylinder(output.frames_matrix[t][k].first.translation(),
+      //                                 output.frames_matrix[t][k].first.translation() + output.start_to_aim_projected_track[t][k],
+      //                                 rvt::colors::BROWN, rvt::scales::SMALL, "start_to_aim_projected"); 
+
+      // visual_tools_->publishCylinder(output.frames_matrix[t][k].first.translation(),
+      //                                 output.frames_matrix[t][k].first.translation() + output.start_to_end_track[t][k],
+      //                                 rvt::colors::WHITE, rvt::scales::SMALL, "start_to_end");
+
+      // visual_tools_->publishCylinder(output.frames_matrix[t][k].first.translation(),
+      //                               output.frames_matrix[t][k].first.translation() + output.start_to_end_projected_track[t][k],
+      //                               rvt::colors::CYAN, rvt::scales::SMALL, "start_to_end_projected");
 
         // first
         Eigen::Isometry3d coordinate_isometry;
@@ -244,8 +295,8 @@ int main(int argc, char** argv)
         // publishLabelHelper(visual_tools_, coordinate_isometry, "end" + std::to_string(k));
         visual_tools_->trigger();
 
-        // ros::Duration(1.0).sleep();
-        visual_tools_->prompt("next");
+        ros::Duration(1.0).sleep();
+       // visual_tools_->prompt("next");
       } 
     }  
     
