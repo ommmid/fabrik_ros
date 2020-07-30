@@ -33,43 +33,43 @@ int main(int argc, char** argv)
 
   // ---------------------- Solve another forward kinematics close to the first one:
   fabrik::RobotModelPtr robot_model = fabrik::makeSimpleRobot2D();
-    fabrik::RobotStatePtr robot_state_2 = 
-        std::make_shared<fabrik::RobotState>(robot_model);
+  fabrik::RobotStatePtr robot_state_2 = 
+      std::make_shared<fabrik::RobotState>(robot_model);
     
-    robot_state_2->setReachingDirection(fabrik::ReachingDirection::FORWARD);
-    double theta_1 = M_PI_4 + 0.1;
-    double theta_2 = 0.1;
-    double theta_3 = 0.1;
-    std::vector<double> fk_joints_values_2 = {theta_1, theta_2, theta_3};
-    for (int k = 0; k < 3; ++k)
-        robot_state_2->updateState(fk_joints_values_2[k], k);
+  robot_state_2->setReachingDirection(fabrik::ReachingDirection::FORWARD);
+  double theta_1 = M_PI_4 + 0.1;
+  double theta_2 = 0.1;
+  double theta_3 = 0.1;
+  std::vector<double> fk_joints_values_2 = {theta_1, theta_2, theta_3};
+  for (int k = 0; k < 3; ++k)
+      robot_state_2->updateState(fk_joints_values_2[k], k);
 
-    robot_state_2->printState("FABRIK - second configuration", std::vector<int>{-1});
+  robot_state_2->printState("FABRIK - second configuration", std::vector<int>{-1});
 
-    Eigen::Affine3d end_effector_2 = robot_state_2->getFrames(2).second;
+  Eigen::Affine3d end_effector_2 = robot_state_2->getFrames(2).second;
 
-    Eigen::Affine3d target = end_effector_2;
-    double threshold = 0.001;
-    double requested_iteration_num = 3;
+  Eigen::Affine3d target = end_effector_2;
+  double threshold = 0.001;
+  double requested_iteration_num = 3;
 
-    fabrik::FABRIKPtr fabrik(new fabrik::FABRIK(robot_model,
-                                                fk_joints_values_2,
-                                                target,
-                                                threshold,
-                                                requested_iteration_num,
-                                                fabrik::CalculatorType::POSITION));
+  fabrik::FABRIKPtr fabrik(new fabrik::FABRIK(robot_model, fk_joints_values_2));
+
+  fabrik->setInverseKinematicsInput(target,
+                                    threshold,
+                                    requested_iteration_num,
+                                    fabrik::CalculatorType::POSITION);
  
-    fabrik::FabrikOutput output;
-    bool solved = fabrik->solve(output);
+  fabrik::IKOutput output;
+  bool solved = fabrik->solveIK(output);
 
-    std::cout << "solved? " << solved << std::endl;
-    if(solved)
-    {
-        std::cout << "total iteration: " << output.final_iteration_num << std::endl;
-        std::cout << "error: " << output.target_ee_error << std::endl;
-        for (int k = 0; k < 3; ++k)
-            std::cout << "joint value_" << k << ":" << output.solution_joints_values[k] << std::endl;
-    }
+  std::cout << "solved? " << solved << std::endl;
+  if(solved)
+  {
+      std::cout << "total iteration: " << output.final_iteration_num << std::endl;
+      std::cout << "error: " << output.target_ee_error << std::endl;
+      for (int k = 0; k < 3; ++k)
+          std::cout << "joint value_" << k << ":" << output.solution_joints_values[k] << std::endl;
+  }
 
   // Visualization
   // ========================================================================================

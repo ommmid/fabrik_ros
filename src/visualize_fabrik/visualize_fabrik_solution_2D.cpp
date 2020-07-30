@@ -45,6 +45,15 @@ int main(int argc, char** argv)
   spinner.start();
   ros::NodeHandle node_handle("~");
 
+    ROS_INFO("-------------------------------- **** ////////// ----------- ");
+    Eigen::Vector3d vec1(1,0,0);
+    vec1.normalize();
+    Eigen::Affine3d link1_frame(Eigen::AngleAxisd(-M_PI_2, vec1));
+    link1_frame.translation() = Eigen::Vector3d(0, 0, 0.333/2);
+    std::string link1_name = "link1";
+    fabrik::Link link1(link1_name,  link1_frame);
+
+
   // ---------------------- Solve another forward kinematics close to the first one:
   fabrik::RobotModelPtr robot_model = fabrik::makeSimpleRobot2D();
 
@@ -78,15 +87,15 @@ int main(int argc, char** argv)
   double threshold = 0.01;
   double requested_iteration_num = 10;
 
-  fabrik::FABRIKPtr fabrik(new fabrik::FABRIK(robot_model,
-                                              fk_joints_values_1,
-                                              target,
-                                              threshold,
-                                              requested_iteration_num,
-                                              fabrik::CalculatorType::POSITION));
+  fabrik::FABRIKPtr fabrik(new fabrik::FABRIK(robot_model, fk_joints_values_1));
 
-  fabrik::FabrikOutput output;
-  bool solved = fabrik->solve(output);
+  fabrik->setInverseKinematicsInput(target,
+                                    threshold,
+                                    requested_iteration_num,
+                                    fabrik::CalculatorType::POSITION);
+
+  fabrik::IKOutput output;
+  bool solved = fabrik->solveIK(output);
 
   if(solved)
   {

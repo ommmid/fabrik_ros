@@ -27,7 +27,7 @@ catkin_package(
 message([WARNING] "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message([WARNING] "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 
-# find_package looks for .so and header files (basically find_path and find_library combined)
+# find_package looks for .so and header files (basically it does find_path and find_library combined)
 # we need to find the package by CONFIG mode because in fabrik library, I create fabrikConfig.cmake
 # if fabrik had a FindFabrik.config instead, I would use find_package in MODULE mode
 find_package(fabrik CONFIG REQUIRED)
@@ -57,21 +57,20 @@ target_link_libraries(test_node fabrik ${catkin_LIBRARIES} )
 add_executable(rviz_visual_tools_demo src/rviz_visual_tools_demo.cpp)
 target_link_libraries(rviz_visual_tools_demo ${catkin_LIBRARIES} )
 
-add_executable(visualize_fabrik_solution_2D src/visualize_fabrik_solution_2D.cpp)
+add_executable(visualize_fabrik_solution_2D src/visualize_fabrik/visualize_fabrik_solution_2D.cpp)
 target_link_libraries(visualize_fabrik_solution_2D fabrik ${catkin_LIBRARIES} )
 
-add_executable(visualize_fabrik_solution_3D src/visualize_fabrik_solution_3D.cpp)
+add_executable(visualize_fabrik_solution_3D src/visualize_fabrik/visualize_fabrik_solution_3D.cpp)
 target_link_libraries(visualize_fabrik_solution_3D fabrik ${catkin_LIBRARIES} )
 
 add_executable(test_calculateReach src/test_calculateReach.cpp)
 target_link_libraries(test_calculateReach fabrik ${catkin_LIBRARIES} )
 
-
 include_directories(include)
 add_library(FabrikModel src/fabrik_model/fabrik_model.cpp)
 target_link_libraries(FabrikModel fabrik)
 
-add_executable(urdf2fabrik src/convert_urdf_to_fabrik_model.cpp)
+add_executable(urdf2fabrik src/fabrik_model/convert_urdf_to_fabrik_model.cpp)
 target_link_libraries(urdf2fabrik fabrik FabrikModel  ${catkin_LIBRARIES} )
 
 

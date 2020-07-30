@@ -5,8 +5,19 @@
 
 
 
-FabrikModel::FabrikModel()
+FabrikModel::FabrikModel(const std::string& urdf_file)
 {
-    std::cout << "fadfkkkkkkkkkkkkkkkkkkk " << std::endl;
+    std::string urdf_file_path = "/home/omid/ws_fabrik_ros/src/fabrik_ros/urdf/model.urdf";
+    
+    if (!urdf_model_.initFile(urdf_file_path)){
+        std::cout << "Failed to parse urdf file" << std::endl;
+        std::terminate();
+    }
 }
 
+
+FabrikModel::FabrikModel(const urdf::Model& urdf_model):
+urdf_model_(urdf_model)
+{
+
+}
