@@ -8,9 +8,10 @@ find_package(catkin REQUIRED
   COMPONENTS
   interactive_markers
   rviz_visual_tools
-   roscpp
-   urdf
+  roscpp
+  urdf
 )
+
 
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED)
@@ -45,12 +46,27 @@ endif()
 message([WARNING] " $fabrik_INCLUDE_DIR: ${FABRIK_INCLUDE_DIR}")
 message([WARNING] " $fabrik_INCLUDE_DIRS: ${FABRIK_INCLUDE_DIRs}")
 
+find_package(ccd CONFIG REQUIRED)
+
+if(${ccd_FOUND})
+  message([WARNING] "----------------------ccd was found. Yayy!")
+else()
+  message([WARNING] "----------------------ccd was not found. Damn")
+endif()
+
+message([WARNING] " $ccd_INCLUDE_DIR: ${CCD_INCLUDE_DIR}")
+message([WARNING] " $ccd_INCLUDE_DIRS: ${CCD_INCLUDE_DIRs}")
+
+
 include_directories(${THIS_PACKAGE_INCLUDE_DIRS}
                     ${catkin_INCLUDE_DIRS}
                     ${Boost_INCLUDE_DIR}
                     ${EIGEN3_INCLUDE_DIRS}
-                    ${FABRIK_INCLUDE_DIR})
+                    ${FABRIK_INCLUDE_DIR}
+                    ${CCD_INCLUDE_DIR})
 
+
+# fabrik
 add_executable(test_node src/test_node.cpp)
 target_link_libraries(test_node fabrik ${catkin_LIBRARIES} )
 
@@ -74,4 +90,7 @@ add_executable(urdf2fabrik src/fabrik_model/convert_urdf_to_fabrik_model.cpp)
 target_link_libraries(urdf2fabrik fabrik FabrikModel  ${catkin_LIBRARIES} )
 
 
+#  ccd
+# add_executable(visualize_ccd_solution_2D src/visualize_fabrik/visualize_ccd_solution_2D.cpp)
+# target_link_libraries(visualize_ccd_solution_2D ccd  ${catkin_LIBRARIES})
 

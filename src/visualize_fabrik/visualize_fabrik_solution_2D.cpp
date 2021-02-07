@@ -9,7 +9,6 @@
 
 #include <rviz_visual_tools/rviz_visual_tools.h>
 
-
 namespace rvt = rviz_visual_tools;
 
 void publishLabelHelper(rvt::RvizVisualToolsPtr& visual_tools_, const Eigen::Isometry3d& pose, const std::string& label)
@@ -52,7 +51,6 @@ int main(int argc, char** argv)
     link1_frame.translation() = Eigen::Vector3d(0, 0, 0.333/2);
     std::string link1_name = "link1";
     fabrik::Link link1(link1_name,  link1_frame);
-
 
   // ---------------------- Solve another forward kinematics close to the first one:
   fabrik::RobotModelPtr robot_model = fabrik::makeSimpleRobot2D();
